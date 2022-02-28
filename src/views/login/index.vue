@@ -75,8 +75,9 @@ export default {
   data () {
     return {
       user: {
-        mobile: '', // 手机号 13911111111
-        code: '' // 验证码 246810
+        mobile: '13911111111', // 手机号 13911111111
+        code: '246810', // 验证码 246810
+        duration: 0 // 持续时间，默认是2000
       },
       userFormRules: {
         mobile: [{
@@ -110,35 +111,28 @@ export default {
       this.$toast.loading({
         message: '登录中...',
         forbidClick: true, // 禁用背景点击
-        duration: 0 // 持续时间 默认是2000 永不停止
+        duration: 0// 持续时间 默认是2000 0表示持续不关闭
       })
-      // 3.提交表单请求登录
+      // 3.提交表单 请求登录
       try {
-        const res = await login(user)
-        console.log('登录成功', res)
+        // const { data } = await login(this.user)
+        const { data } = await login(user)
+        this.$store.commit('setUser', data.data)
         this.$toast.success('登录成功')
       } catch (err) {
         if (err.response.status === 400) {
-          // console.log('手机号或验证码错误')
           this.$toast.fail('手机号或验证码错误')
         } else {
-          // console.log('登录失败', err)
-          this.$toast.fail('登陆失败，请稍后重试')
+          this.$toast.fail('登录失败，请稍后重试')
         }
       }
       // 4.根据请求响应结果处理后续操作
     },
+
     async onSendSms () {
-      console.log('onSendSms')
       // 1.校验手机号
-      // try {
-      //   await this.$refs.loginForm.validate('mobile')
-      // } catch (err) {
-      //   return console.log('验证失败', err)
-      // }
       try {
         await this.$refs.loginForm.validate('mobile')
-        console.log('验证通过')
       } catch (err) {
         console.log('验证失败', err)
       }
