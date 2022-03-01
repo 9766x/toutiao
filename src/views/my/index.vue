@@ -6,11 +6,11 @@
         <div class="left">
           <van-image
             class="avatar"
-            src="https://img01.yzcdn.cn/vant/cat.jpeg"
+            :src="userInfo.photo"
             round
             fit="cover"
           />
-          <span class="name">玛卡巴卡</span>
+          <span class="name">{{ userInfo.name }}</span>
         </div>
         <div class="right">
           <van-button size="mini" round>编辑资料</van-button>
@@ -18,19 +18,19 @@
       </div>
       <div class="data-stats">
         <div class="data-item">
-          <span class="count">10</span>
+          <span class="count">{{ userInfo.art_count }}</span>
           <span class="text">头条</span>
         </div>
         <div class="data-item">
-          <span class="count">10</span>
+          <span class="count">{{ userInfo.follow_count }}</span>
           <span class="text">关注</span>
         </div>
         <div class="data-item">
-          <span class="count">10</span>
+          <span class="count">{{ userInfo.fans_count }}</span>
           <span class="text">粉丝</span>
         </div>
         <div class="data-item">
-          <span class="count">10</span>
+          <span class="count">{{ userInfo.like_count }}</span>
           <span class="text">获赞</span>
         </div>
       </div>
@@ -64,42 +64,63 @@
     <van-cell
     v-if="user"
     class="logout-cell"
+    clickable
     title="退出登录"
+    @click="onLogout"
     />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+import { getUserInfo } from '@/api/user'
 
 export default {
   name: 'MyIndex',
   components: {},
   props: {},
   data () {
-    return {}
+    return {
+      userInfo: {} // 用户信息
+    }
   },
   computed: {
     ...mapState(['user'])
   },
   watch: {},
-  created () {},
+  created () {
+    // 如果用户登录了，则请求加载用户信息数据
+    if (this.user) {
+      this.loadUserInfo()
+    }
+  },
   mounted () {},
   methods: {
     onLogout () {
       // 退出提示
+      // 在组件中需要使用 this.$dialog 来调用弹窗组件
       this.$dialog.confirm({
         title: '确认退出吗?'
       })
         .then(() => {
-        // on confirm
+          // on confirm
           console.log('确认执行这里')
+          // 确认退出：清除登录状态(容器中的 user + 本地存储中的 user)
+          this.$store.commit('setUser', null)
         })
         .catch(() => {
         // on cancel
           console.log('取消执行这里')
         })
-      // 确认退出：清除登录状态(容器中的 user + 本地存储中的 user)
+    },
+    async loadUserInfo () {
+      try {
+        const { data } = await getUserInfo()
+        this.userInfo = data.data
+        console.log(data)
+      } catch (err) {
+        this.$toast('获取数据失败，请稍后重试')
+      }
     }
   }
 }
