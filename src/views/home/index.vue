@@ -24,7 +24,11 @@
       :title="channel.name"
       v-for="channel in channels"
       :key="channel.id"
-      >{{ channel.name }}的内容</van-tab>
+      >
+      <!-- 文章列表 -->
+      <article-list :channel="channel" />
+      <!-- /文章列表 -->
+      </van-tab>
       <div slot="nav-right" class="placeholder"></div>
       <div slot="nav-right" class="hamburger-btn">
         <i class="toutiao toutiao-gengduo"></i>
@@ -36,10 +40,13 @@
 
 <script>
 import { getUserChannels } from '@/api/user'
+import ArticleList from './componets/article-list'
 
 export default {
   name: 'HomeIndex',
-  components: {},
+  components: {
+    ArticleList
+  },
   props: {},
   data () {
     return {
@@ -68,6 +75,7 @@ export default {
 
 <style scoped lang="less">
 .home-container {
+  padding-bottom: 100px;
   // 已在全局样式中加载
   // .van-nav-bar_title {
   //   max-width: unset;
