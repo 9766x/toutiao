@@ -40,7 +40,7 @@
 
 <script>
 import { getUserChannels } from '@/api/user'
-import ArticleList from './componets/article-list'
+import ArticleList from './components/article-list'
 
 export default {
   name: 'HomeIndex',
@@ -93,7 +93,7 @@ export default {
   }
   /deep/.channel-tabs {
     // .van-tabs__wrap {
-      // width: 82px;
+      // width: 82px; bug ?
     // }
     .van-tabs__wrap {
       position: fixed;
