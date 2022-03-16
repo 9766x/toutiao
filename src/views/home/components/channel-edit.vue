@@ -8,14 +8,15 @@
             plain
             round
             size="mini"
-          >编辑</van-button>
+            @click="isEdit = !isEdit"
+          >{{ isEdit ? '完成'  : '编辑' }}</van-button>
       </van-cell>
       <van-grid class="my-grid" :gutter="10">
         <van-grid-item
           class="grid-item"
           v-for="(channel, index) in myChannels"
           :key="index"
-          icon="clear"
+          @click="onMyChannelClick(channel, index)"
         >
           <!--
               v-bind:class 语法
@@ -24,6 +25,10 @@
                      true， 则作用该类名
                      false，不作用类名
            -->
+          <van-icon
+            v-show="isEdit && !fixedChannels.includes(channel.id)"
+            slot="icon"
+            name="clear"></van-icon>
           <span
             class="text"
             slot="text"
@@ -51,16 +56,23 @@
 </template>
 
 <script>
-import { getAllChannels } from '@/api/channle'
+import {
+  getAllChannels,
+  addUserChannel,
+  deleteUserChannel
+} from '@/api/channle'
+import { mapState } from 'vuex'
+import { setItem } from '@/utils/storage'
 
 export default {
   name: 'ChannelEdit',
   components: {},
   props: {
-    myChannels: {
-      type: Array,
-      required: true
-    },
+    // // 待修复 恢复
+    // myChannels: {
+    //   type: Array,
+    //   required: true
+    // },
     active: {
       type: Number,
       required: true
@@ -68,11 +80,18 @@ export default {
   },
   data () {
     return {
-      allChannels: [] // 所有频道
+      allChannels: [], // 所有频道
+      // myChannels: [],
+      isEdit: false, // 控制编辑状态的显示
+      fixedChannels: [0] // 固定频道，不允许删除
     }
   },
   computed: {
+    ...mapState(['user']),
+    // 计算属性会观测内部依赖数据的变化
+    // 如果依赖的数据发生变化，则计算属性会重新执行
     recommendChannels () {
+      // console.log('1233')
       // 数组的 filter 方法：遍历数组，把符合条件的元素存储到新数组中并返回
       return this.allChannels.filter(channel => {
         // const channels = []
@@ -113,8 +132,59 @@ export default {
         this.$toast('数据获取失败')
       }
     },
-    onAddChannel (channel) {
-      this.myChannel.push(channel)
+    async onAddChannel (channel) {
+      this.myChannels.push(channel)
+      // 数据持久化处理
+      if (this.user) {
+        try {
+          // 已登录，把数据请求接口放到线上
+          await addUserChannel({
+            id: channel.id, // 频道ID
+            seq: this.myChannels.length// 序号
+          })
+        } catch (err) {
+          this.$toast('保存失败，请稍后重试')
+        }
+      } else {
+        // 未登录，把数据存储到本地
+        setItem('TOUTIAO_CHANNELS', this.myChannels)
+      }
+    },
+    onMyChannelClick (channel, index) {
+      // console.log(channel, index)
+      if (this.isEdit) {
+        // 1.如果是固定频道，则不删除
+        if (this.fixedChannels.includes(channel.id)) {
+          return
+        }
+        // 2.删除频道项
+        this.myChannels.splice(index, 1)
+        // 3.如果删除的激活频道之前的频道，则更新激活的频道项
+        // 参数1：要删除的元素的开始索引（包括）
+        // 参数2：删除的个数，如果不指定，则从参数1开始一直删除到最后
+        if (index <= this.active) {
+          // 让激活频道的索引 -1
+          this.$emit('update-active', this.active - 1)
+        }
+        // 4.处理持久化
+        this.deleteChannel()
+      } else {
+        // 非编辑状态，执行切换频道
+        this.$emit('update-active', index, false)
+      }
+    },
+    async deleteChannel (channel) {
+      try {
+        if (this.user) {
+          // 已登录，则将数据更新到线上
+          await deleteUserChannel(channel.id)
+        } else {
+          // 未登录，将数据更新到本地
+          setItem('TOUTIAO_CHANNELS', this.myChannels)
+        }
+      } catch (err) {
+        this.$toast('操作失败，请稍后重试')
+      }
     }
   }
 }
@@ -141,12 +211,15 @@ export default {
             white-space: nowrap;
             background-color: #f4f5f6;
             .van-grid-item__text, text {
-                font-size: 28px;
+                font-size: 20px;
                 color: #222;
                 margin-top: 0;
             }
             .active {
                 color: red;
+            }
+            .van-grid-item__icon-wrapper {
+              position: unset;
             }
         }
     }
@@ -157,7 +230,7 @@ export default {
                 right: -10px;
                 top: -10px;
                 font-size: 30px;
-                color: blue;
+                color: #202020;
                 z-index: 2;
             }
         }
