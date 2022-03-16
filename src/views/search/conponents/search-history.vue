@@ -5,16 +5,11 @@
           <span>完成</span>
           <van-icon name="delete-o" />
       </van-cell>
-      <van-cell title="nihao">
-        <van-icon name="close" />
-      </van-cell>
-      <van-cell title="nihao">
-        <van-icon name="close" />
-      </van-cell>
-      <van-cell title="nihao">
-        <van-icon name="close" />
-      </van-cell>
-      <van-cell title="nihao">
+      <van-cell
+        :title="item"
+        v-for="(item,index) in searchHistories"
+        :key="index"
+      >
         <van-icon name="close" />
       </van-cell>
   </div>
@@ -24,7 +19,12 @@
 export default {
   name: 'SearchHistory',
   components: {},
-  props: {},
+  props: {
+    searchHistories: {
+      type: Array,
+      required: true
+    }
+  },
   data () {
     return {}
   },

@@ -4,7 +4,7 @@
       <!--
           在 van-search 外层增加 form 标签，且 action 不为空，即可在 iOS 输入法中显示搜索按钮。
        -->
-      <form action="/">
+      <form class="search-form" action="/">
         <van-search
             v-model="searchText"
             show-action
@@ -18,18 +18,25 @@
       <!-- /搜索栏 -->
 
       <!-- 搜索结果 -->
-      <search-result v-if="isResultShow" />
+      <search-result
+        v-if="isResultShow"
+        :search-text="searchText"
+      />
       <!-- /搜索结果 -->
 
       <!-- 联想建议 -->
       <search-suggestion
         v-else-if="searchText"
         :search-text="searchText"
+        @search="onSearch"
       />
       <!-- /联想建议 -->
 
       <!-- 搜索历史记录 -->
-      <search-history v-else />
+      <search-history
+        v-else
+        :search-histories="searchHistories"
+      />
       <!-- /搜索历史记录 -->
   </div>
 </template>
@@ -50,7 +57,8 @@ export default {
   data () {
     return {
       searchText: '',
-      isResultShow: false // 控制搜索结果的展示
+      isResultShow: false, // 控制搜索结果的展示
+      searchHistories: []
     }
   },
   computed: {},
@@ -59,7 +67,13 @@ export default {
   mounted () {},
   methods: {
     onSearch (val) {
-      console.log(val)
+      // 更新文本框内容
+      this.searchText = val
+
+      // 存储搜索历史记录
+      this.searchHistories.push(val)
+
+      // 渲染搜索结果
       this.isResultShow = true
     },
     onCancel () {
@@ -71,8 +85,16 @@ export default {
 
 <style scoped lang="less">
 .search-container {
+  padding-top: 108px;
     .van-search__action {
         color: yellow;
+    }
+    .search-form {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1;
     }
 }
 </style>
