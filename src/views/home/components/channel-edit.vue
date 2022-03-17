@@ -69,10 +69,10 @@ export default {
   components: {},
   props: {
     // // 待修复 恢复
-    // myChannels: {
-    //   type: Array,
-    //   required: true
-    // },
+    myChannels: {
+      type: Array,
+      required: true
+    },
     active: {
       type: Number,
       required: true
@@ -133,7 +133,7 @@ export default {
       }
     },
     async onAddChannel (channel) {
-      this.myChannels.push(channel)
+      // this.myChannels.push(channel)
       // 数据持久化处理
       if (this.user) {
         try {
@@ -158,7 +158,7 @@ export default {
           return
         }
         // 2.删除频道项
-        this.myChannels.splice(index, 1)
+        // this.myChannels.splice(index, 1)
         // 3.如果删除的激活频道之前的频道，则更新激活的频道项
         // 参数1：要删除的元素的开始索引（包括）
         // 参数2：删除的个数，如果不指定，则从参数1开始一直删除到最后
