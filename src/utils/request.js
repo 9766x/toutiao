@@ -3,9 +3,28 @@
  */
 import axios from 'axios'
 import store from '@/store'
+// import JSONBig from 'json-bigint'
+
+// JSON.parse()
+// JSON.stringify()
+
+// JSONBig可以处理数据中超出JavaScript 安全整数范围的问题
+// JSONBig.parse() // JSON 格式字符串转为 JavaScript 对象
+// JSONBig.stringify() // 把JavaScript 对象转为 JSON 格式字符串
 
 const request = axios.create({
-  baseURL: 'http://toutiao.itheima.net/' // 接口的基准路径
+  // 接口的基准路径
+  baseURL: 'http://toutiao.itheima.net/',
+
+  // 自定义后端返回的原始数据
+  // data: 后端返回的原始数据 JSON格式的字符串
+  transformResponse: [function (data) {
+    try {
+      return JSON.parse(data)
+    } catch (err) {
+      return data
+    }
+  }]
 })
 
 // 请求拦截器
