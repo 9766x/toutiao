@@ -3,7 +3,7 @@
  */
 import axios from 'axios'
 import store from '@/store'
-// import JSONBig from 'json-bigint'
+import JSONBig from 'json-bigint'
 
 // JSON.parse()
 // JSON.stringify()
@@ -20,7 +20,7 @@ const request = axios.create({
   // data: 后端返回的原始数据 JSON格式的字符串
   transformResponse: [function (data) {
     try {
-      return JSON.parse(data)
+      return JSONBig.parse(data)
     } catch (err) {
       return data
     }
