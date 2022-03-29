@@ -10,6 +10,9 @@ export const getComments = params => {
   return request({
     method: 'GET',
     url: '/v1_0/comments',
+    // GET 参数使用params 进行传递
+    // 我们写的时候是对象,但是最终发给后端的数据是?
+    // axios 会把 params 对象转为 key=value?key=value 的格式放到 url中发送
     params
   })
 }
@@ -36,6 +39,19 @@ export const deleteCommentLike = target => {
     url: `/v1_0/comment/likings/${target}`,
     data: {
       target
+    }
+  })
+}
+
+/**
+ * 发布文章评论或评论回复
+ */
+export const addComment = data => {
+  return request({
+    method: 'POST',
+    url: '/v1_0/comments',
+    data: {
+      data
     }
   })
 }

@@ -89,6 +89,7 @@
         <comment-list
           :source="article.art_id"
           @onload-success="totalCommentCount = $event.total_count"
+          @reply-click="onReplyClick"
         />
         <!-- /文章评论列表 -->
         <!-- 底部区域 -->
@@ -128,7 +129,10 @@
           position="bottom"
           :style="{ height: '30%' }"
         >
-          <comment-post />
+          <comment-post
+            :target="article.art_id"
+            @post-success="onPostSuccess"
+          />
         </van-popup>
         <!-- /发布评论弹出层 -->
       </div>
@@ -152,6 +156,22 @@
       </div>
       <!-- /加载失败：其它未知错误（例如网络原因或服务端异常） -->
     </div>
+    <!-- 评论回复 -->
+    <!--
+      弹出层是懒渲染的:只有在第一次展示的时候才会渲染里面的内容,之后它的关闭和显示都是在切换内容的显示和隐藏
+    -->
+    <van-popup
+      v-model="isReplyShow"
+      position="bottom"
+      style="height: 100%"
+    >
+      <comment-reply
+        v-if="isReplyShow"
+        :comment="currentComment"
+        @click="isReplyShow = false"
+      />
+    </van-popup>
+    <!-- /评论回复 -->
   </div>
 </template>
 
@@ -163,6 +183,7 @@ import CollectArticle from '@/components/collect-article'
 import LikeArticle from '@/components/like-article'
 import CommentList from './components/comment-list'
 import CommentPost from './components/comment-post'
+import CommentReply from './components/comment-reply'
 
 export default {
   name: 'ArticleIndex',
@@ -171,7 +192,13 @@ export default {
     CollectArticle,
     LikeArticle,
     CommentList,
-    CommentPost
+    CommentPost,
+    CommentReply
+  },
+  provide: function () {
+    return {
+      getMap: this.getMap
+    }
   },
   props: {
     articleId: {
@@ -186,7 +213,10 @@ export default {
       errStatus: 0, // 失败的状态码
       followLoading: false,
       totalCommentCount: 0,
-      isPostShow: false // 控制发布评论的显示状态
+      isPostShow: false, // 控制发布评论的显示状态
+      commentList: [], // 评论列表
+      isReplyShow: true,
+      currentComment: {} // 当前点击回复的评论项
     }
   },
   computed: {},
@@ -241,6 +271,17 @@ export default {
           })
         }
       })
+    },
+    onPostSuccess (data) {
+      // 关闭弹出层
+      this.isPostShow = false
+      // 将发布内容展示到列表顶部
+      this.commentList.unshift(data.new_obj)
+    },
+    onReplyClick (comment) {
+      this.currentComment = comment
+      // 显示评论回复弹出层
+      this.isReplyShow = true
     }
   }
 }
