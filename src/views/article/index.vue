@@ -195,9 +195,11 @@ export default {
     CommentPost,
     CommentReply
   },
+  // 给所有后代组件提供数据
+  // 注意：不要滥用
   provide: function () {
     return {
-      getMap: this.getMap
+      articleId: this.articleId
     }
   },
   props: {
