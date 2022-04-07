@@ -168,7 +168,7 @@
       <comment-reply
         v-if="isReplyShow"
         :comment="currentComment"
-        @click="isReplyShow = false"
+        @close="isReplyShow = false"
       />
     </van-popup>
     <!-- /评论回复 -->
@@ -217,7 +217,7 @@ export default {
       totalCommentCount: 0,
       isPostShow: false, // 控制发布评论的显示状态
       commentList: [], // 评论列表
-      isReplyShow: true,
+      isReplyShow: false, // 显示弹层
       currentComment: {} // 当前点击回复的评论项
     }
   },
